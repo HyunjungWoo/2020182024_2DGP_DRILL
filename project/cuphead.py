@@ -33,7 +33,7 @@ def handle_events():   #이벤트
 
     for event in events:
         if event.type == SDL_QUIT:
-            running = False
+            pass
         elif event.type == SDL_KEYDOWN:  ## 키 누를 때
             if event.key == SDLK_RIGHT:  ## 오른쪽
                 de= 0
@@ -42,11 +42,12 @@ def handle_events():   #이벤트
                 de = 1
                 dirx -= 3
             elif event.key == SDLK_DOWN: ##아래
-                if(running == True):
-                    running = False
-                    duck = True
+               pass
+
+            elif event.key == SDLK_UP:
+                diry += 3
             elif event.key == SDLK_ESCAPE:## esc
-                running = False
+              pass
 
         elif event.type == SDL_KEYUP:  ## 키를 뗐을 때
             if event.key == SDLK_RIGHT: ##오른쪽
@@ -56,9 +57,9 @@ def handle_events():   #이벤트
                 de = 1
                 dirx += 3
             elif event.key == SDLK_DOWN:##아래
-                duck = False
-                running = True
-
+                pass
+            elif event.key == SDLK_UP:
+                diry -= 3
 
 
 
@@ -108,12 +109,17 @@ jumping = True
 
 #점프
 while(jumping):
-    clear_canvas()
-    im_jum.clip_draw((frame * 124) ,0,127,125,x,y)
-    update_canvas()
 
+    clear_canvas()
+    im_jum.clip_draw((frame * 124),0,125,125,800,800)
+    update_canvas()
+    handle_events()
     frame = (frame +1) % 15
-    delay(0.01)
+    y = diry * 5
+    delay(0.05)
+
+
+
 
 '''
 #앉기
@@ -131,7 +137,6 @@ while(duck):
 
 
 close_canvas()
-
 
 
 
