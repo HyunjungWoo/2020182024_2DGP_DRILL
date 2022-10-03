@@ -3,7 +3,11 @@ open_canvas()
 grass = load_image('grass.png')
 character = load_image('ch2_jumping.png')
 
+str1 = 'ch2_jumping'
+num = 0
+str2 = '.png'
 
+character = load_image(str1+num+str2)
 x = 0
 frame = 0
 while(x < 800):
