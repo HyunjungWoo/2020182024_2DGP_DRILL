@@ -2,12 +2,14 @@ import game_framework
 from pico2d import *
 import play_state
 import title_state
+
+running = True
 image = None
 
 
 def enter():
     global image
-    image = load_image('item_select.png')
+    image = load_image('add_delete_boy.png')
     pass
 
 def exit():
@@ -16,6 +18,7 @@ def exit():
     pass
 
 def update():
+    play_state.update()
     pass
 
 def draw():
@@ -34,17 +37,14 @@ def handle_events():
             match event.key:
                 case pico2d.SDLK_ESCAPE:
                     game_framework.pop_state()
-                case pico2d.SDLK_0:
-                    play_state.set_all_boys_items('None')
-                    game_framework.pop_state()
-                case pico2d.SDLK_1:
-                    #play_state.boy.item = 'Ball'
-                    game_framework.pop_state()
-                    play_state.set_all_boys_items('Ball')
-                case pico2d.SDLK_2:
-                    #play_state.boy.item = 'BigBall'
-                    game_framework.pop_state()
-                    play_state.set_all_boys_items('BigBall')
+                case pico2d.SDLK_LEFTBRACKET:
+                    #print('delete one boy')
+                    play_state.delete_one_boy()
+                case pico2d.SDLK_RIGHTBRACKET:
+                    #print('add one boy')
+                    play_state.add_one_boy()
+    delay(0.05)
+
 
 
 

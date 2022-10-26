@@ -2,9 +2,11 @@ import pico2d
 import play_state
 import logo_state
 
+
 pico2d.open_canvas()
 
-states = [logo_state, play_state]
+states = [logo_state ,play_state]
+
 for state in states:
     state.enter()
     while play_state.running:

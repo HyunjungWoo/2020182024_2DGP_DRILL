@@ -2,7 +2,8 @@ from pico2d import *
 import game_framework
 import title_state
 import item_state
-import boy_add_delete
+import boy_adjust_state
+import random
 class Grass:
     def __init__(self):
         self.image = load_image('grass.png')
@@ -12,8 +13,8 @@ class Grass:
 
 class Boy:
     def __init__(self):
-        self.x, self.y = 0, 90
-        self.frame = 0
+        self.x, self.y = random.randint(0,800), 90
+        self.frame = random.randint(0,7)
         self.image = load_image('animation_sheet.png')
         self.dir = 1 #오른쪽
         self.item = None
@@ -35,8 +36,6 @@ class Boy:
 
 
     def draw(self):
-
-
         if self.dir ==1:
             self.image.clip_draw(self.frame*100, 100, 100, 100, self.x, self.y)
         else:
@@ -56,37 +55,40 @@ def handle_events():
         if event.type == SDL_QUIT:
             game_framework.quit()
         elif event.type == SDL_KEYDOWN:
-            if event.key == SDLK_ESCAPE:
-                game_framework.pop_state()
-            elif event.key == SDLK_i:
-                game_framework.push_state(item_state)
-            elif event.key == SDLK_b:
-                game_framework.push_state(boy_add_delete)
-
+            match event.key:
+                case pico2d.SDLK_ESCAPE:
+                #game_framework.change_state(title_state)
+                    game_framework.quit()
+                case pico2d.SDLK_i:
+                    game_framework.push_state(item_state)
+                case pico2d.SDLK_b:
+                    game_framework.push_state(boy_adjust_state)
     delay(0.01)
-boy = None
+#boy = None
+boys =[] #여러 명의 소년들 
 grass = None
 running = True
 
 
 #초기화
 def enter():
-    global boy,grass,running
-
-    boy = Boy()
+    global grass,running
+    boys.append(Boy())
+   
     grass = Grass()
     running = True
 
 
 # finalization code
 def exit():
-    global boy, grass
-    del boy
+    global grass
+    for boy in boys:
+        del boy
     del grass
 
 def update():
-
-    boy.update()
+    for boy in boys:
+        boy.update()
 def draw():
     clear_canvas()
     draw_world()
@@ -95,10 +97,22 @@ def draw():
 
 def draw_world():
     grass.draw()
-    boy.draw()
+    for boy in boys:
+        boy.draw()
 
 
 def pause():
     pass
 def resume():
     pass
+
+def add_one_boy():
+    boys.append(Boy())
+
+def delete_one_boy():
+    if len(boys)>=2:
+        boys.pop()
+
+def set_all_boys_items(item):
+    for boy in  boys:
+        boy.item = item
