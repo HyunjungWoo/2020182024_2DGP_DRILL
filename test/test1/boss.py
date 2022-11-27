@@ -328,8 +328,8 @@ def death_draw(self):
     else:
         Boss_Goopy.Death[int(self.frame)].clip_composite_draw(0, 0, self.Death[int(self.frame)].w, Boss_Goopy.Death[int(self.frame)].h, 0,'n', self.x, self.y,Boss_Goopy.Death[int(self.frame)].w//1.5, Boss_Goopy.Death[int(self.frame)].h//1.5)
 
-INTRO_FRAMES_PER_ACTION = 10 # 프레임 장수(사진 갯수)
-INTRO_TIME_PER_ACTION   = 1.0 #속도 조절
+INTRO_FRAMES_PER_ACTION = 16 # 프레임 장수(사진 갯수)
+INTRO_TIME_PER_ACTION   = 1 #속도 조절
 INTRO_ACTION_PER_TIME   = 1.0 /INTRO_TIME_PER_ACTION
 
 MOVE_FRAMES_PER_ACTION = 7 # 프레임 장수(사진 갯수)
@@ -347,63 +347,82 @@ class Fall_Tomb:
             Fall_Tomb.image = load_image('monster/Goopy/Phase 3/Intro/slime_tomb_fall_0001.png')
         Tomb.x = boss.x
         Tomb.y = 900
-        Tomb.diry = 1
+        Tomb.dirx,Tomb.diry = 1,2
         Tomb.dir = boss.dir 
         Tomb.frame = 0
         Tomb.state = None
-        for i in range(10): #death 3 비석 이미지 
+        Tomb.floor = False
+        
+        for i in range(15): #death 3 비석 이미지 
             a = load_image('monster/Goopy/Phase 3/Intro/slime_tomb_fall(%d).png' % i)
             Fall_Tomb.Intro.append(a)
         for i in range(7): #death 3 비석 움직임 이미지 
             a = load_image('monster/Goopy/Phase 3/Move/Left/slime_tomb_move(%d).png' % i)
             Fall_Tomb.Move.append(a)
+    
     def update(Tomb):
-        print(Tomb.y)
+        print(Tomb.state)   
+        
         if Tomb.diry != 0:
             Tomb.y -= Tomb.diry *1
-            
+         
         if Tomb.state == TombState['Intro']:
             Intro_update(Tomb)
         elif Tomb.state == TombState['Move']:
             move_update(Tomb)
+            Tomb.x += Tomb.dirx*3
+            if Tomb.x < 50 :
+                Tomb.dir = 1
+                Tomb.dirx = 1
+            elif Tomb.x >1100:
+                Tomb.dir = -1
+                Tomb.dirx = -1
+            
+            
     
     def draw(Tomb):
-        #draw_rectangle(*self.get_bb())
+        draw_rectangle(*Tomb.get_bb())
         if Tomb.state == TombState['Intro']:
             Intro_draw(Tomb) 
         elif Tomb.state == TombState['Move']:
             move_draw(Tomb)
         else:
-            Tomb.image.draw(Tomb.x, Tomb.y, Tomb.image.w//1.5, Tomb.image.h//1.5)
+            Tomb.image.draw(Tomb.x, Tomb.y, Tomb.image.w//1.2, Tomb.image.h//1.2)
         
     def get_bb(Tomb): 
-        return Tomb.x -200, Tomb.y-200 ,Tomb.x +200 ,Tomb.y +200
+        if Tomb.state == TombState['Move']:
+            return Tomb.x -100,Tomb.y -100,Tomb.x +100, Tomb.y + 100
+        return Tomb.x -150, Tomb.y-170 ,Tomb.x +150 ,Tomb.y +170
    
     def handle_collision(Tomb,other,group):
         if other.sort =='monster':
             game_world.remove_object(other)
         elif other.sort =='floor':
-            print('충돌')
-            Tomb.state = TombState['Intro']
-            Tomb.diry = 0
+            # print('충돌')
+            if Tomb.floor ==False:
+             Tomb.state = TombState['Intro']
+             Tomb.y = 320
+             Tomb.floor = True
+             Tomb.diry = 0
 
 def Intro_update(Tomb):
-    Tomb.frame = (Tomb.frame +INTRO_FRAMES_PER_ACTION * INTRO_ACTION_PER_TIME*game_framework.frame_time )%10
+    Tomb.frame = (Tomb.frame +INTRO_FRAMES_PER_ACTION * INTRO_ACTION_PER_TIME*game_framework.frame_time )%16
     
 def Intro_draw(Tomb):
-    if int(Tomb.frame) == 9:        
-        Tomb.state = TombState ['Move']
+    if int(Tomb.frame) ==15:        
+        Tomb.state = TombState['Move']
+        
         Tomb.frame = 0
     if Tomb.dir == 1:#오른쪽
-        Fall_Tomb.Intro[int(Tomb.frame)].clip_composite_draw(0, 0,Fall_Tomb.Intro[int(Tomb.frame)].w,Fall_Tomb.Intro[int(Tomb.frame)].h, 0,'h', Tomb.x, Tomb.y,Fall_Tomb.Intro[int(Tomb.frame)].w//1.5,Fall_Tomb.Intro[int(Tomb.frame)].h//1.5)
+        Fall_Tomb.Intro[int(Tomb.frame)].clip_composite_draw(0, 0,Fall_Tomb.Intro[int(Tomb.frame)].w,Fall_Tomb.Intro[int(Tomb.frame)].h, 0,'h', Tomb.x, Tomb.y,Fall_Tomb.Intro[int(Tomb.frame)].w//1.2,Fall_Tomb.Intro[int(Tomb.frame)].h//1.2)
     else:
-        Fall_Tomb.Intro[int(Tomb.frame)].clip_composite_draw(0, 0, Fall_Tomb.Intro[int(Tomb.frame)].w, Fall_Tomb.Intro[int(Tomb.frame)].h, 0,'n', Tomb.x, Tomb.y,Fall_Tomb.Intro[int(Tomb.frame)].w//1.5, Fall_Tomb.Intro[int(Tomb.frame)].h//1.5)
+        Fall_Tomb.Intro[int(Tomb.frame)].clip_composite_draw(0, 0, Fall_Tomb.Intro[int(Tomb.frame)].w, Fall_Tomb.Intro[int(Tomb.frame)].h, 0,'n', Tomb.x, Tomb.y,Fall_Tomb.Intro[int(Tomb.frame)].w//1.2, Fall_Tomb.Intro[int(Tomb.frame)].h//1.2)
 
 def move_update(Tomb):
     Tomb.frame = (Tomb.frame +MOVE_FRAMES_PER_ACTION * MOVE_ACTION_PER_TIME*game_framework.frame_time ) % 7
 def move_draw(Tomb):
     if Tomb.dir == 1:#오른쪽
-        Fall_Tomb.Move[int(Tomb.frame)].clip_composite_draw(0, 0,Fall_Tomb.Move[int(Tomb.frame)].w,Fall_Tomb.Move[int(Tomb.frame)].h, 0,'h', Tomb.x, Tomb.y,Fall_Tomb.Move[int(Tomb.frame)].w//1.5,Fall_Tomb.Move[int(Tomb.frame)].h//1.5)
+        Fall_Tomb.Move[int(Tomb.frame)].clip_composite_draw(0, 0,Fall_Tomb.Move[int(Tomb.frame)].w,Fall_Tomb.Move[int(Tomb.frame)].h, 0,'h', Tomb.x, Tomb.y,Fall_Tomb.Move[int(Tomb.frame)].w//1.2,Fall_Tomb.Move[int(Tomb.frame)].h//1.2)
     else:
-        Fall_Tomb.Move[int(Tomb.frame)].clip_composite_draw(0, 0, Fall_Tomb.Move[int(Tomb.frame)].w, Fall_Tomb.Move[int(Tomb.frame)].h, 0,'n', Tomb.x, Tomb.y,Fall_Tomb.Move[int(Tomb.frame)].w//1.5, Fall_Tomb.Move[int(Tomb.frame)].h//1.5)
+        Fall_Tomb.Move[int(Tomb.frame)].clip_composite_draw(0, 0, Fall_Tomb.Move[int(Tomb.frame)].w, Fall_Tomb.Move[int(Tomb.frame)].h, 0,'n', Tomb.x, Tomb.y,Fall_Tomb.Move[int(Tomb.frame)].w//1.2, Fall_Tomb.Move[int(Tomb.frame)].h//1.2)
          
